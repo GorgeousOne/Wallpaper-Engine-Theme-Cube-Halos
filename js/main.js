@@ -15,7 +15,7 @@ const camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerH
 camera.position.z = 20;
 
 const geometry = new THREE.IcosahedronGeometry(1, 0);
-const material = new THREE.MeshLambertMaterial({color: 0x515151})
+const material = new THREE.MeshLambertMaterial({color: 0x282828})
 const cube = new THREE.Mesh(geometry, material);
 
 //make tip point up
@@ -36,11 +36,21 @@ cube.setRotationFromQuaternion(cube.quaternion);
 let defaultRot = cube.quaternion.clone();
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-const target = new THREE.Object3D();
-target.position.set(-1, 0, -3);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight.target = target;
+const target1 = new THREE.Object3D();
+const target2 = new THREE.Object3D();
+const target3 = new THREE.Object3D();
+target1.position.set(0, -1.7, -1.8);
+target2.position.set(3, 1.75, -0.8);
+target3.position.set(-2.8, -0.1, -1.6);
+
+const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.15);
+const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.15);
+
+dirLight1.target = target1;
+dirLight2.target = target2;
+dirLight3.target = target3;
 
 const texture = new THREE.TextureLoader().load("./public/backdrop.png");
 texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -57,8 +67,14 @@ const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.position.set(0, 0, -5);
 scene.add(cube);
 scene.add(ambientLight);
-scene.add(target);
-scene.add(directionalLight);
+
+scene.add(target1);
+scene.add(target2);
+scene.add(target3);
+scene.add(dirLight1);
+scene.add(dirLight2);
+scene.add(dirLight3);
+
 scene.add(plane);
 
 let mouseDown = false;
