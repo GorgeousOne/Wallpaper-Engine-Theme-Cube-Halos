@@ -1,15 +1,10 @@
 import {
 	EventDispatcher,
-	MOUSE,
 	Quaternion,
 	Spherical,
-	TOUCH,
 	Vector2,
 	Vector3
 } from 'three';
-// OrbitControls performs orbiting
-// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
-//
 //    Orbit - left mouse / touch: one-finger move
 const _changeEvent = {type: 'change'};
 const _startEvent = {type: 'start'};
@@ -175,7 +170,6 @@ export class RotationControl extends EventDispatcher {
 			sphericalDelta.phi -= angle;
 		}
 
-
 		function handleMouseMoveRotate(event) {
 			rotateEnd.set(event.clientX, event.clientY);
 			rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed);
@@ -185,7 +179,6 @@ export class RotationControl extends EventDispatcher {
 			rotateStart.copy(rotateEnd);
 			scope.update();
 		}
-
 
 		function handleTouchStartRotate() {
 			if (pointers.length === 1) {
@@ -304,7 +297,6 @@ export class RotationControl extends EventDispatcher {
 			const pointer = (event.pointerId === pointers[0].pointerId) ? pointers[1] : pointers[0];
 			return pointerPositions[pointer.pointerId];
 		}
-
 		//
 		scope.domElement.addEventListener('contextmenu', onContextMenu);
 		scope.domElement.addEventListener('pointerdown', onPointerDown);
