@@ -30,11 +30,11 @@ export class InputManager extends EventDispatcher {
 
 		this.update = function () {
 			return function update() {
-				for (let mesh of this.spinMeshes) {
+				for (const mesh of this.spinMeshes) {
 					const isDragged = mesh === draggedMesh;
 
 					if (isDragged) {
-						mesh.setSpin(mouseRot - mesh.rotation);
+						mesh.setSpin(mouseRot - mesh.getRotation());
 					}
 					mesh.rotate(isDragged);
 				}
@@ -65,14 +65,14 @@ export class InputManager extends EventDispatcher {
 			rotateStart.set(event.clientX, event.clientY);
 			const radius = mid.distanceTo(rotateStart) / mid.y;
 
-			if (radius < 0.5) {
+			if (radius < 0.35) {
 				draggedMesh = scope.spinMeshes[0];
-			} else if (radius < 1) {
+			} else if (radius < .65) {
 				draggedMesh = scope.spinMeshes[1];
 			} else {
-				return;
+				draggedMesh = scope.spinMeshes[2];
 			}
-			mouseRot = draggedMesh.rotation;
+			mouseRot = draggedMesh.getRotation();
 		}
 
 		function onMouseUp() {

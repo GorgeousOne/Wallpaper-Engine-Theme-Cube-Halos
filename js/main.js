@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {InputManager} from "./inputManager";
-import {SpinMesh} from "./spinMesh";
+import {SpinMesh, CompositeSpinMesh} from "./spinMesh";
 
 const phi = (1 + Math.sqrt(5)) / 2;
 
@@ -18,7 +18,8 @@ camera.position.z = 14.8;
 
 const input = new InputManager(renderer.domElement);
 
-const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
+// const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
+const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x303030})
 
 //-------------- ico
 
@@ -26,9 +27,9 @@ const icoGeometry = new THREE.IcosahedronGeometry(1, 0);
 const icoMesh = new THREE.Mesh(icoGeometry, darkMatteMat);
 
 //make tip point up
-icoMesh.rotation.z += Math.atan(1 / phi);
+icoMesh.rotation.z = Math.atan(1 / phi);
 //make nice triangle face front
-icoMesh.rotation.y += Math.atan(-.5 / phi);
+icoMesh.rotation.y = Math.atan(-.5 / phi);
 
 //x-axis tilt to make top & bot triangles have a nice size ratio
 const frontTilt = .15;
@@ -41,18 +42,53 @@ let axis = new THREE.Vector3(0, 1, 0).applyQuaternion(quatAxisTilt)
 applyQuat(icoMesh, quatAxisTilt);
 
 const spinIco = new SpinMesh(icoMesh, axis, 0.0005);
-input.addSpinMesh(spinIco);
 
 //---------- actual dice
 
-const haloCubeSize1 = 0.5;
+const haloCubeSize1 = 0.3;
+const haloCubeSize2 = 0.48;
 
-const cubeGeometry = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCubeSize1);
-const cubeMesh = new THREE.Mesh(cubeGeometry, darkMatteMat);
+const cubeGeometry1 = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCubeSize1);
+const cubeGeometry2 = new THREE.BoxGeometry(haloCubeSize2, haloCubeSize2, haloCubeSize2);
 
-const spinCube = new SpinMesh(cubeMesh, new THREE.Vector3(0, 0, 1), 0.0005);
-spinCube.setOffset(new THREE.Vector3(3.7, 0, 0));
-input.addSpinMesh(spinCube);
+// let innerHaloCubes = []
+const numCubes = 12;
+const innerHalo = createHalo(cubeGeometry1, numCubes, new THREE.Vector3(0.9, 0.47, -0.08), new THREE.Vector3(2.5, 0, 0));
+const outerHalo = createHalo(cubeGeometry2, numCubes, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
+
+/**
+ *
+ * @param {BufferGeometry} geometry
+ * @param {number} numElems
+ * @param {THREE.Vector3} eulerRot
+ * @param {THREE.Vector3} offset
+ * @returns {CompositeSpinMesh}
+ */
+function createHalo(geometry, numElems, eulerRot, offset) {
+	let halo = [];
+
+	for (let i = 0; i < numElems; ++i) {
+		const angle = 2 * Math.PI / numCubes * i;
+		const spokeRot = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+
+		const mesh = new THREE.Mesh(geometry, darkMatteMat);
+		mesh.rotation.set(eulerRot.x, eulerRot.y, eulerRot.z);
+		applyQuat(mesh, spokeRot);
+		scene.add(mesh);
+
+		const spinMesh = new SpinMesh(mesh, new THREE.Vector3(0, 0, 1), 0.0005);
+		spinMesh.setOffset(offset.clone().applyQuaternion(spokeRot));
+		halo.push(spinMesh);
+	}
+	return new CompositeSpinMesh(halo);
+}
+
+//----------- input thingies
+
+input.addSpinMesh(spinIco);
+input.addSpinMesh(innerHalo);
+input.addSpinMesh(outerHalo);
+
 
 //----------- light
 
@@ -67,8 +103,8 @@ target2.position.set(3, 1.75, -0.8);
 target3.position.set(-2.8, -0.1, -1.6);
 
 const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
-const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.15);
-const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.15);
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.3);
 
 dirLight1.target = target1;
 dirLight2.target = target2;
@@ -84,7 +120,7 @@ texture.encoding = THREE.sRGBEncoding;
 const radFOV = THREE.MathUtils.degToRad(camera.fov);
 const planeDist = camera.position.z + 2; //this should be +1 .-.
 const planeScale = 2 * planeDist * Math.atan(0.5 * radFOV);
-const planeGeometry = new THREE.PlaneGeometry(planeScale * 16/9, planeScale);
+const planeGeometry = new THREE.PlaneGeometry(planeScale * 16 / 9, planeScale);
 const planeMaterial = new THREE.MeshBasicMaterial({
 	map: texture
 });
@@ -93,7 +129,6 @@ const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.position.set(0, 0, -1);
 
 scene.add(icoMesh);
-scene.add(cubeMesh);
 scene.add(plane);
 
 scene.add(ambientLight);
@@ -104,7 +139,6 @@ scene.add(target3);
 scene.add(dirLight1);
 scene.add(dirLight2);
 scene.add(dirLight3);
-
 
 /**
  *
