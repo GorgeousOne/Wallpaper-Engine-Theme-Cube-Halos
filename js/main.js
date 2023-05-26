@@ -18,8 +18,7 @@ camera.position.z = 14.8;
 
 const input = new InputManager(renderer.domElement);
 
-// const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
-const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x303030})
+const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
 
 //-------------- ico
 
@@ -52,9 +51,8 @@ const cubeGeometry1 = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCu
 const cubeGeometry2 = new THREE.BoxGeometry(haloCubeSize2, haloCubeSize2, haloCubeSize2);
 
 // let innerHaloCubes = []
-const numCubes = 12;
-const innerHalo = createHalo(cubeGeometry1, numCubes, new THREE.Vector3(0.9, 0.47, -0.08), new THREE.Vector3(2.5, 0, 0));
-const outerHalo = createHalo(cubeGeometry2, numCubes, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
+const innerHalo = createHalo(cubeGeometry1, 12, new THREE.Vector3(0.9, 0.47, -0.08), new THREE.Vector3(2.5, 0, 0));
+const outerHalo = createHalo(cubeGeometry2, 18, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
 
 /**
  *
@@ -68,7 +66,7 @@ function createHalo(geometry, numElems, eulerRot, offset) {
 	let halo = [];
 
 	for (let i = 0; i < numElems; ++i) {
-		const angle = 2 * Math.PI / numCubes * i;
+		const angle = 2 * Math.PI / numElems * i;
 		const spokeRot = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
 
 		const mesh = new THREE.Mesh(geometry, darkMatteMat);
@@ -89,9 +87,7 @@ input.addSpinMesh(spinIco);
 input.addSpinMesh(innerHalo);
 input.addSpinMesh(outerHalo);
 
-
 //----------- light
-
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 
