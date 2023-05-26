@@ -91,20 +91,14 @@ input.addSpinMesh(outerHalo);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 
-const target1 = new THREE.Object3D();
-const target2 = new THREE.Object3D();
-const target3 = new THREE.Object3D();
-target1.position.set(0, -1.7, -1.8);
-target2.position.set(3, 1.75, -0.8);
-target3.position.set(-2.8, -0.1, -1.6);
+const pointLight1 = new THREE.PointLight(0xffffff, 0.5);
+const pointLight2 = new THREE.PointLight(0xffffff, 0.15);
+const pointLight3 = new THREE.PointLight(0xffffff, 0.15);
 
-const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
-const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
-const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.3);
 
-dirLight1.target = target1;
-dirLight2.target = target2;
-dirLight3.target = target3;
+pointLight1.position.set(0, 3.4, 3.6);
+pointLight2.position.set(-6, -3.5, 1.6);
+pointLight3.position.set(5.6, 0.2, 3.2);
 
 const texture = new THREE.TextureLoader().load("/backdrop.png");
 texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -129,12 +123,9 @@ scene.add(plane);
 
 scene.add(ambientLight);
 
-scene.add(target1);
-scene.add(target2);
-scene.add(target3);
-scene.add(dirLight1);
-scene.add(dirLight2);
-scene.add(dirLight3);
+scene.add(pointLight1);
+scene.add(pointLight2);
+scene.add(pointLight3);
 
 /**
  *
