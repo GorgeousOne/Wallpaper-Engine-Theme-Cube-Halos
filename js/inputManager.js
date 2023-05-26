@@ -4,12 +4,17 @@ import {
 	Vector2,
 } from 'three';
 
+import {SpinMesh} from "./spinMesh";
+
+
 export class InputManager extends EventDispatcher {
 
-	constructor(domElement, cube, axis, defaultRot) {
+	constructor(domElement) {
 		super();
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
+
+		this.spinMeshes = [];
 
 		const scope = this;
 		scope.domElement.addEventListener('mousemove', onMouseMove);
@@ -17,12 +22,7 @@ export class InputManager extends EventDispatcher {
 		scope.domElement.addEventListener('mouseup', onMouseUp);
 
 		let isDieHeld = false;
-		let rotation = 0;
 		let mouseRot = 0;
-		let spin = 0;
-
-		let dampingFactor = 0.005;
-		let snappingFactor = 0.05;
 
 		const rotateStart = new Vector2();
 		const rotateEnd = new Vector2();
@@ -30,18 +30,12 @@ export class InputManager extends EventDispatcher {
 
 		this.update = function () {
 			return function update() {
+				let die = this.spinMeshes[0];
 
 				if (isDieHeld) {
-					spin = mouseRot - rotation;
-					rotation += spin * snappingFactor;
-
-				} else {
-					rotation += spin;
-					spin *= (1 - dampingFactor);
+					die.setSpin(mouseRot - die.rotation);
 				}
-				let newRot = new Quaternion().setFromAxisAngle(axis, rotation);
-				newRot.multiply(defaultRot);
-				cube.setRotationFromQuaternion(newRot);
+				die.rotate(isDieHeld);
 			}
 		}();
 
@@ -70,14 +64,26 @@ export class InputManager extends EventDispatcher {
 
 			if (mid.distanceTo(rotateStart) < 0.5 * mid.y) {
 				isDieHeld = true;
-				mouseRot = rotation;
+				mouseRot = scope.spinMeshes[0].rotation;
 			}
 		}
 
 		function onMouseUp() {
+			if (!isDieHeld) {
+				return;
+			}
 			isDieHeld = false;
 			const element = scope.domElement;
-			spin = 2 * Math.PI * rotateDelta.x / element.clientHeight;
+			//set cube speed to whatever it snapped last
+			scope.spinMeshes[0].spin *= scope.spinMeshes[0].snappingFactor;
 		}
+	}
+
+	/**
+	 *
+	 * @param {SpinMesh} spinMesh
+	 */
+	addSpinMesh(spinMesh) {
+		this.spinMeshes.push(spinMesh)
 	}
 }

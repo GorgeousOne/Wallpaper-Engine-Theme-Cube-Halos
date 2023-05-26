@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {InputManager} from "./inputManager";
+import {SpinMesh} from "./spinMesh";
 
 const phi = (1 + Math.sqrt(5)) / 2;
 
@@ -34,9 +35,11 @@ let axis = new THREE.Vector3(0, 1, 0).applyQuaternion(quatAxisTilt)
 
 cube.quaternion.multiplyQuaternions(quatAxisTilt, cube.quaternion);
 cube.setRotationFromQuaternion(cube.quaternion);
-let defaultRot = cube.quaternion.clone();
+const defaultRot = cube.quaternion.clone();
 
-const input = new InputManager(renderer.domElement, cube, axis, defaultRot);
+const spinDie = new SpinMesh(cube, axis)
+const input = new InputManager(renderer.domElement);
+input.addSpinMesh(spinDie);
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
