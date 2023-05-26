@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {InputManager} from "./inputManager";
 
 const phi = (1 + Math.sqrt(5)) / 2;
 
@@ -35,6 +36,9 @@ cube.quaternion.multiplyQuaternions(quatAxisTilt, cube.quaternion);
 cube.setRotationFromQuaternion(cube.quaternion);
 let defaultRot = cube.quaternion.clone();
 
+const input = new InputManager(renderer.domElement, cube, axis, defaultRot);
+
+
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 
 const target1 = new THREE.Object3D();
@@ -52,7 +56,7 @@ dirLight1.target = target1;
 dirLight2.target = target2;
 dirLight3.target = target3;
 
-const texture = new THREE.TextureLoader().load("./public/backdrop.png");
+const texture = new THREE.TextureLoader().load("/backdrop.png");
 texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.encoding = THREE.sRGBEncoding;
@@ -65,7 +69,10 @@ const planeMaterial = new THREE.MeshBasicMaterial({
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.position.set(0, 0, -5);
+
 scene.add(cube);
+scene.add(plane);
+
 scene.add(ambientLight);
 
 scene.add(target1);
@@ -75,39 +82,11 @@ scene.add(dirLight1);
 scene.add(dirLight2);
 scene.add(dirLight3);
 
-scene.add(plane);
 
-let mouseDown = false;
-let mouseX = 0;
-let rotationY = 0;
-
-function onMouseMove(event) {
-	if (!mouseDown) return;
-
-	let deltaX = event.clientX - mouseX;
-	rotationY += deltaX * 0.01;
-	mouseX = event.clientX;
-}
-
-function onMouseDown(event) {
-	mouseDown = true;
-	mouseX = event.clientX;
-}
-
-function onMouseUp() {
-	mouseDown = false;
-}
-
-document.addEventListener('mousemove', onMouseMove, false);
-document.addEventListener('mousedown', onMouseDown, false);
-document.addEventListener('mouseup', onMouseUp, false);
 
 function animate() {
 	requestAnimationFrame(animate);
-	let newRot = new THREE.Quaternion().setFromAxisAngle(axis, rotationY);
-	newRot.multiply(defaultRot);
-	cube.setRotationFromQuaternion(newRot);
-
+	input.update();
 	renderer.render(scene, camera);
 }
 
