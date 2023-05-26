@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {InputManager} from "./inputManager";
 import {SpinMesh} from "./spinMesh";
-import {MathUtils} from "three";
 
 const phi = (1 + Math.sqrt(5)) / 2;
 
@@ -17,14 +16,19 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 14.8;
 
-const geometry = new THREE.IcosahedronGeometry(1, 0);
-const material = new THREE.MeshLambertMaterial({color: 0x282828})
-const cube = new THREE.Mesh(geometry, material);
+const input = new InputManager(renderer.domElement);
+
+const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
+
+//-------------- ico
+
+const icoGeometry = new THREE.IcosahedronGeometry(1, 0);
+const icoMesh = new THREE.Mesh(icoGeometry, darkMatteMat);
 
 //make tip point up
-cube.rotation.z += Math.atan(1 / phi);
+icoMesh.rotation.z += Math.atan(1 / phi);
 //make nice triangle face front
-cube.rotation.y += Math.atan(-.5 / phi);
+icoMesh.rotation.y += Math.atan(-.5 / phi);
 
 //x-axis tilt to make top & bot triangles have a nice size ratio
 const frontTilt = .15;
@@ -34,13 +38,23 @@ quatAxisTilt.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(
 
 let axis = new THREE.Vector3(0, 1, 0).applyQuaternion(quatAxisTilt)
 
-cube.quaternion.multiplyQuaternions(quatAxisTilt, cube.quaternion);
-cube.setRotationFromQuaternion(cube.quaternion);
-const defaultRot = cube.quaternion.clone();
+applyQuat(icoMesh, quatAxisTilt);
 
-const spinDie = new SpinMesh(cube, axis, 0.0005)
-const input = new InputManager(renderer.domElement);
-input.addSpinMesh(spinDie);
+const spinIco = new SpinMesh(icoMesh, axis, 0.0005);
+input.addSpinMesh(spinIco);
+
+//---------- actual dice
+
+const haloCubeSize1 = 0.5;
+
+const cubeGeometry = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCubeSize1);
+const cubeMesh = new THREE.Mesh(cubeGeometry, darkMatteMat);
+
+const spinCube = new SpinMesh(cubeMesh, new THREE.Vector3(0, 0, 1), 0.0005);
+spinCube.setOffset(new THREE.Vector3(3.7, 0, 0));
+input.addSpinMesh(spinCube);
+
+//----------- light
 
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
@@ -65,7 +79,9 @@ texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.encoding = THREE.sRGBEncoding;
 
-const radFOV = MathUtils.degToRad(camera.fov);
+//--------------- background
+
+const radFOV = THREE.MathUtils.degToRad(camera.fov);
 const planeDist = camera.position.z + 2; //this should be +1 .-.
 const planeScale = 2 * planeDist * Math.atan(0.5 * radFOV);
 const planeGeometry = new THREE.PlaneGeometry(planeScale * 16/9, planeScale);
@@ -76,7 +92,8 @@ const planeMaterial = new THREE.MeshBasicMaterial({
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.position.set(0, 0, -1);
 
-scene.add(cube);
+scene.add(icoMesh);
+scene.add(cubeMesh);
 scene.add(plane);
 
 scene.add(ambientLight);
@@ -89,6 +106,15 @@ scene.add(dirLight2);
 scene.add(dirLight3);
 
 
+/**
+ *
+ * @param {THREE.Object3D} mesh
+ * @param {THREE.Quaternion} quat
+ */
+function applyQuat(mesh, quat) {
+	mesh.quaternion.multiplyQuaternions(quat, mesh.quaternion);
+	mesh.setRotationFromQuaternion(mesh.quaternion);
+}
 
 function animate() {
 	requestAnimationFrame(animate);

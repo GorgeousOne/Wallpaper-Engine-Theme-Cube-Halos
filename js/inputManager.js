@@ -21,7 +21,7 @@ export class InputManager extends EventDispatcher {
 		scope.domElement.addEventListener('mousedown', onMouseDown);
 		scope.domElement.addEventListener('mouseup', onMouseUp);
 
-		let isDieHeld = false;
+		let draggedMesh;
 		let mouseRot = 0;
 
 		const rotateStart = new Vector2();
@@ -30,12 +30,14 @@ export class InputManager extends EventDispatcher {
 
 		this.update = function () {
 			return function update() {
-				let die = this.spinMeshes[0];
+				for (let mesh of this.spinMeshes) {
+					const isDragged = mesh === draggedMesh;
 
-				if (isDieHeld) {
-					die.setSpin(mouseRot - die.rotation);
+					if (isDragged) {
+						mesh.setSpin(mouseRot - mesh.rotation);
+					}
+					mesh.rotate(isDragged);
 				}
-				die.rotate(isDieHeld);
 			}
 		}();
 
@@ -47,7 +49,7 @@ export class InputManager extends EventDispatcher {
 			rotateEnd.set(event.clientX, event.clientY);
 			rotateDelta.subVectors(rotateEnd, rotateStart);
 
-			if (isDieHeld) {
+			if (draggedMesh !== null) {
 				const element = scope.domElement;
 				rotateMouse(2 * Math.PI * rotateDelta.x / element.clientHeight);
 			}
@@ -61,20 +63,24 @@ export class InputManager extends EventDispatcher {
 				element.clientHeight / 2);
 
 			rotateStart.set(event.clientX, event.clientY);
+			const radius = mid.distanceTo(rotateStart) / mid.y;
 
-			if (mid.distanceTo(rotateStart) < 0.5 * mid.y) {
-				isDieHeld = true;
-				mouseRot = scope.spinMeshes[0].rotation;
+			if (radius < 0.5) {
+				draggedMesh = scope.spinMeshes[0];
+			} else if (radius < 1) {
+				draggedMesh = scope.spinMeshes[1];
+			} else {
+				return;
 			}
+			mouseRot = draggedMesh.rotation;
 		}
 
 		function onMouseUp() {
-			if (!isDieHeld) {
+			if (draggedMesh === null) {
 				return;
 			}
-			isDieHeld = false;
-			const cube = scope.spinMeshes[0];
-			cube.startFreeSpin();
+			draggedMesh.startFreeSpin();
+			draggedMesh = null;
 		}
 	}
 
