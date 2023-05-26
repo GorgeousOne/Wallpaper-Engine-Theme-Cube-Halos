@@ -73,9 +73,8 @@ export class InputManager extends EventDispatcher {
 				return;
 			}
 			isDieHeld = false;
-			const element = scope.domElement;
-			//set cube speed to whatever it snapped last
-			scope.spinMeshes[0].spin *= scope.spinMeshes[0].snappingFactor;
+			const cube = scope.spinMeshes[0];
+			cube.startFreeSpin();
 		}
 	}
 

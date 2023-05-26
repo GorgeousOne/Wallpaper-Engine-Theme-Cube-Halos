@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {InputManager} from "./inputManager";
 import {SpinMesh} from "./spinMesh";
+import {MathUtils} from "three";
 
 const phi = (1 + Math.sqrt(5)) / 2;
 
@@ -13,8 +14,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 20;
+const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 14.8;
 
 const geometry = new THREE.IcosahedronGeometry(1, 0);
 const material = new THREE.MeshLambertMaterial({color: 0x282828})
@@ -37,7 +38,7 @@ cube.quaternion.multiplyQuaternions(quatAxisTilt, cube.quaternion);
 cube.setRotationFromQuaternion(cube.quaternion);
 const defaultRot = cube.quaternion.clone();
 
-const spinDie = new SpinMesh(cube, axis)
+const spinDie = new SpinMesh(cube, axis, 0.0005)
 const input = new InputManager(renderer.domElement);
 input.addSpinMesh(spinDie);
 
@@ -64,14 +65,16 @@ texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.encoding = THREE.sRGBEncoding;
 
-const planeGeometry = new THREE.PlaneGeometry(16, 9);
+const radFOV = MathUtils.degToRad(camera.fov);
+const planeDist = camera.position.z + 2; //this should be +1 .-.
+const planeScale = 2 * planeDist * Math.atan(0.5 * radFOV);
+const planeGeometry = new THREE.PlaneGeometry(planeScale * 16/9, planeScale);
 const planeMaterial = new THREE.MeshBasicMaterial({
-	side: THREE.DoubleSide,
 	map: texture
 });
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.set(0, 0, -5);
+plane.position.set(0, 0, -1);
 
 scene.add(cube);
 scene.add(plane);
