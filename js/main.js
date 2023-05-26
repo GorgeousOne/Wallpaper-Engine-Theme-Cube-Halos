@@ -100,7 +100,7 @@ pointLight1.position.set(0, 3.4, 3.6);
 pointLight2.position.set(-6, -3.5, 1.6);
 pointLight3.position.set(5.6, 0.2, 3.2);
 
-const texture = new THREE.TextureLoader().load("/backdrop.png");
+const texture = new THREE.TextureLoader().load("/background.png");
 texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.encoding = THREE.sRGBEncoding;
