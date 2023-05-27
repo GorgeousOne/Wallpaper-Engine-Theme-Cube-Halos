@@ -5,7 +5,7 @@ import {SpinMesh, CompositeSpinMesh} from "./spinMesh";
 const phi = (1 + Math.sqrt(5)) / 2;
 
 const renderer = new THREE.WebGLRenderer({
-	canvas: document.getElementById("bg"),
+	canvas: document.getElementById("fg"),
 	alpha: true,
 	antialias: true,
 	preserveDrawingBuffer: true
@@ -19,7 +19,29 @@ camera.position.z = 14.8;
 
 const input = new InputManager(renderer.domElement);
 
+//---------- Material
+
 const darkMatteMat = new THREE.MeshLambertMaterial({color: 0x282828})
+
+// add raytracing like noise :D
+darkMatteMat.onBeforeCompile = function ( shader ) {
+	shader.fragmentShader = shader.fragmentShader.replace(
+		"}",
+		`
+	float noise = (noise(gl_FragCoord.xy) - 0.5) * 1.0 / 256.0;
+	gl_FragColor += vec4(vec3(noise), 1);
+}
+	`);
+
+	shader.fragmentShader = shader.fragmentShader.replace(
+		"void main() {",
+		`
+float noise(vec2 co) {
+	return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+void main() {
+		`);
+}
 
 //-------------- ico
 
@@ -51,7 +73,6 @@ const haloCubeSize2 = 0.48;
 const cubeGeometry1 = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCubeSize1);
 const cubeGeometry2 = new THREE.BoxGeometry(haloCubeSize2, haloCubeSize2, haloCubeSize2);
 
-// let innerHaloCubes = []
 const innerHalo = createHalo(cubeGeometry1, 12, new THREE.Vector3(0.9, 0.47, -0.08), new THREE.Vector3(2.5, 0, 0));
 const outerHalo = createHalo(cubeGeometry2, 18, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
 
