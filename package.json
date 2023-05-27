@@ -4,15 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.mjs",
+    "watch": "nodemon -w ./js -e js -x npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "nodemon": "^2.0.22",
     "three": "^0.152.2"
   },
   "devDependencies": {
-    "vite": "^4.3.8"
+    "esbuild": "^0.17.19"
   }
 }
