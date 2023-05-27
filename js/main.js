@@ -5,12 +5,13 @@ import {SpinMesh, CompositeSpinMesh} from "./spinMesh";
 const phi = (1 + Math.sqrt(5)) / 2;
 
 const renderer = new THREE.WebGLRenderer({
+	canvas: document.getElementById("bg"),
+	alpha: true,
 	antialias: true,
 	preserveDrawingBuffer: true
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -95,31 +96,16 @@ const pointLight1 = new THREE.PointLight(0xffffff, 0.5);
 const pointLight2 = new THREE.PointLight(0xffffff, 0.15);
 const pointLight3 = new THREE.PointLight(0xffffff, 0.15);
 
-
 pointLight1.position.set(0, 3.4, 3.6);
 pointLight2.position.set(-6, -3.5, 1.6);
 pointLight3.position.set(5.6, 0.2, 3.2);
 
-const texture = new THREE.TextureLoader().load("/background.png");
+const texture = new THREE.TextureLoader().load("background.png", console.log, console.log, console.log);
 texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.encoding = THREE.sRGBEncoding;
 
-//--------------- background
-
-const radFOV = THREE.MathUtils.degToRad(camera.fov);
-const planeDist = camera.position.z + 2; //this should be +1 .-.
-const planeScale = 2 * planeDist * Math.atan(0.5 * radFOV);
-const planeGeometry = new THREE.PlaneGeometry(planeScale * 16 / 9, planeScale);
-const planeMaterial = new THREE.MeshBasicMaterial({
-	map: texture
-});
-
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.set(0, 0, -1);
-
 scene.add(icoMesh);
-scene.add(plane);
 
 scene.add(ambientLight);
 
@@ -137,10 +123,18 @@ function applyQuat(mesh, quat) {
 	mesh.setRotationFromQuaternion(mesh.quaternion);
 }
 
+
 function animate() {
 	requestAnimationFrame(animate);
 	input.update();
 	renderer.render(scene, camera);
 }
 
+function onResize() {
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+}
+
+window.addEventListener("resize", onResize);
 animate();
