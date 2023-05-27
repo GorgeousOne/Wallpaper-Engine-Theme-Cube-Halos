@@ -4,12 +4,32 @@
 	<meta charset="utf-8">
 	<title>My first three.js app</title>
 	<style>
-		body { margin: 0; }
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #030303;
+		}
+		#bg-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		#bg-container img {
+			max-height: 100vh;
+		}
+		#bg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+		}
 	</style>
 </head>
 <body>
-<script type="module" src="js/spinMesh.js"></script>
-<script type="module" src="js/inputManager.js"></script>
-<script type="module" src="js/main.js"></script>
+<div id="bg-container">
+	<img src="images/background.png" alt="a suspended icosahedron surrounded by two halos of floating cubes">
+</div>
+<canvas id="bg"></canvas>
+<script src="dist/index.js"></script>
 </body>
 </html>

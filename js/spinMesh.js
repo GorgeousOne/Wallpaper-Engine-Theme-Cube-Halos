@@ -14,7 +14,7 @@ export class SpinMesh {
 	 * @param {number} snapping
 	 * @param {number} motor
 	 */
-	constructor(mesh, rotAxis, motor = 0, damping = 0.005, snapping = 0.05) {
+	constructor(mesh, rotAxis, motor = 0, damping = 0.001, snapping = 0.05) {
 		this.mesh = mesh;
 		this.rotAxis = rotAxis;
 		this.defaultOffset = new Vector3();
