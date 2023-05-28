@@ -4,7 +4,7 @@ This project is an animated interactive desktop wallpaper that I use with [Livel
 It works like a static website and uses [Three.js](https://threejs.org/) for 3D rendering.  
 (There should definetely be a way to use this in Wallpaper Engine)
 
-![Video](art/demo.webm)
+[Demo](https://github.com/GorgeousOne/Wallpaper-Engine-Theme-Cube-Halos/assets/27733909/83cf302e-40af-4ed7-b1a1-f13177c5f507)
 
 # Built With
 * node
