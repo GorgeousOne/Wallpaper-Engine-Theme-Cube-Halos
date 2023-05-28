@@ -63,12 +63,10 @@ export class SpinMesh {
 	 */
 	rotate(isSnapping) {
 		//make rotation slower the bigger the radius
-		const offsetScale = Math.max(1, this.defaultOffset.length());
-
 		if (isSnapping) {
-			this.rotation += this.spin * this.snappingFactor * offsetScale;
+			this.rotation += this.spin * this.snappingFactor;
 		} else {
-			this.rotation += this.motor / offsetScale + this.spin;
+			this.rotation += this.motor + this.spin;
 			this.spin *= (1 - this.dampingFactor);
 		}
 
@@ -86,8 +84,7 @@ export class SpinMesh {
 	 * Adapt mesh's spin to free spinning physics after mouse release
 	 */
 	startFreeSpin() {
-		const offsetScale = Math.max(1, this.defaultOffset.length());
-		this.spin *= this.snappingFactor * offsetScale;
+		this.spin *= this.snappingFactor;
 
 		if (Math.sign(this.spin) !== Math.sign(this.motor)) {
 			this.motor *= -1;

@@ -74,7 +74,7 @@ const cubeGeometry1 = new THREE.BoxGeometry(haloCubeSize1, haloCubeSize1, haloCu
 const cubeGeometry2 = new THREE.BoxGeometry(haloCubeSize2, haloCubeSize2, haloCubeSize2);
 
 const innerHalo = createHalo(cubeGeometry1, 12, new THREE.Vector3(0.9, 0.47, -0.08), new THREE.Vector3(2.5, 0, 0));
-const outerHalo = createHalo(cubeGeometry2, 18, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
+const outerHalo = createHalo(cubeGeometry2, 16, new THREE.Vector3(-0.45, -0.65, -0.04), new THREE.Vector3(3.8, 0, 0));
 
 /**
  *
