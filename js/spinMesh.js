@@ -1,20 +1,21 @@
 import {
 	Quaternion,
 	Mesh,
-	Vector3
+	Vector3,
+	Vector2
 } from 'three';
 
 export class SpinMesh {
+
 	/**
 	 *
 	 * @param {Mesh} mesh
 	 * @param {Vector3} rotAxis
-	 * @param {Vector3} offset
 	 * @param {number} damping
 	 * @param {number} snapping
 	 * @param {number} motor
 	 */
-	constructor(mesh, rotAxis, motor = 0, damping = 0.001, snapping = 0.05) {
+	constructor(mesh, rotAxis, motor = 0, damping = 0.0005, snapping = 0.05) {
 		this.mesh = mesh;
 		this.rotAxis = rotAxis;
 		this.defaultOffset = new Vector3();
@@ -27,6 +28,19 @@ export class SpinMesh {
 		this.motor = motor;
 	}
 
+	/**
+	 *
+	 * @param {Vector2} pointerStart
+	 * @param {Vector2} pointerEnd
+	 * @param {number} containerHeight
+	 */
+	calcDeltaRotation = function (pointerStart, pointerEnd, containerHeight) {
+		let deltaPos = new Vector2();
+		deltaPos.subVectors(pointerEnd, pointerStart);
+		const offsetScaling = Math.max(1, this.defaultOffset.length());
+		return Math.PI * deltaPos.x / containerHeight / offsetScaling;
+	};
+
 	getRotation() {
 		return this.rotation;
 	}
@@ -36,8 +50,7 @@ export class SpinMesh {
 	 * @param {number }spin
 	 */
 	setSpin(spin) {
-		const offsetScale = Math.max(1, this.defaultOffset.length());
-		this.spin = spin / offsetScale;
+		this.spin = spin;
 	}
 
 	setOffset(offset) {
@@ -93,6 +106,17 @@ export class CompositeSpinMesh {
 		this.spinMeshes = spinMeshes;
 		this.rotation = 0;
 	}
+
+	/**
+	 *
+	 * @param {Vector2} pointerStart
+	 * @param {Vector2} pointerEnd
+	 * @param {number} containerHeight
+	 */
+	calcDeltaRotation = function (pointerStart, pointerEnd, containerHeight) {
+		return this.spinMeshes[0].calcDeltaRotation(pointerStart, pointerEnd, containerHeight);
+	};
+
 
 	setSpin(spin) {
 		for (const mesh of this.spinMeshes) {

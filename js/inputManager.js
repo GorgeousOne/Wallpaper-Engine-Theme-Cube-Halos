@@ -1,6 +1,5 @@
 import {
 	EventDispatcher,
-	Quaternion,
 	Vector2,
 } from 'three';
 
@@ -26,7 +25,6 @@ export class InputManager extends EventDispatcher {
 
 		const rotateStart = new Vector2();
 		const rotateEnd = new Vector2();
-		const rotateDelta = new Vector2();
 
 		this.update = function () {
 			return function update() {
@@ -41,17 +39,12 @@ export class InputManager extends EventDispatcher {
 			}
 		}();
 
-		function rotateMouse(angle) {
-			mouseRot += angle;
-		}
-
 		function onMouseMove(event) {
 			rotateEnd.set(event.clientX, event.clientY);
-			rotateDelta.subVectors(rotateEnd, rotateStart);
 
 			if (draggedMesh !== null) {
 				const element = scope.domElement;
-				rotateMouse(2 * Math.PI * rotateDelta.x / element.clientHeight);
+				mouseRot += draggedMesh.calcDeltaRotation(rotateStart, rotateEnd, element.clientHeight);
 			}
 			rotateStart.copy(rotateEnd);
 		}
