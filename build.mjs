@@ -5,5 +5,5 @@ esbuild.build({
 	bundle: true,
 	minify: true,
 	target: "es2020",
-	outfile: "dist/index.js"
+	outfile: "dist/js/index.js"
 })
